@@ -1,11 +1,24 @@
+from numpy.lib import financial
 import streamlit as st
 import pandas as pd
 import numpy as np
+import numpy_financial as npf
 import altair as alt
+from altair import datum
 
-st.write("""# ¿Que me conviene? ¿Arrendar o comprar?: Un ejercicio simulado.
 
-## Escenario
+st.write("""# ¿Que me conviene, arrendar o comprar?: Un ejercicio simulado.
+
+## Introducción
+
+La respuesta es obvia dirán algunos... Si puedes, conviene siempre comprar!!! Pero esto es claramente incorrecto, dado a que tenemos
+2 alternativas financieras que compiten. Principalmente, cómo precio de venta, tasa de interés, plazo de crédito o valorización esperada
+por un lado o precio de arriendo, rentabilidad esperada de alternativa de inversión por otro lado.
+Ciertamente, es que encontraremos una combinación en donde arrendar sea más financieramente conveniente que comprar. 
+Pero cuál es ese punto. Al parecer, entonces, la pregunta parece estar mal formulado, más bien. ¿Cuando conviene, o en que condiciones comprar vs arrendar?
+El presente articúlo es un ejercicio simulado que intenta descubrir ese punto de inflexión.
+
+## Escenario 
 
 Supongamos que encontramos el departamento de nuestros sueños el cuál tienen una carácteristica especial. 
 Podemos elegir entre comprarlo o arrendarlo. Dónde el precio de venta es de 2000UF y arrendarlo 8 UF mensuales. 
@@ -15,7 +28,7 @@ Ahora si tuviesemos los 2000UF podríamos comprarlo de inmediato. Pero lamentabl
 Sólo disponemos de 400UF, que ahorramos anteriormente, pero el resto tendrá que ser financiado vía crédito. 
 
 Naturalmente, el banco no nos prestará gratis los 1600 UF restantes. Para eso nos ofrece un 
-crédito tiene con una tasa de interés de 3% fija a pagar mensualmente a pagar durante 20 años. Esto, en terminos de dividendo 
+crédito tiene con una tasa de interés de 3% fija a pagar mensualmente durante 20 años. Esto, en terminos de dividendo 
 se traduce en 8.84 UF mensuales (más detalles de este cálculo en otro post). Supongamos también que el único costo complementario asociado corresponden a las contribuciones. 
 Items cómo seguros, costos notariales y cómisiones son 0. Los gastos comunes tampoco en este caso debemos considerarlo 
 en el ánalisis, dado que es un costo que debe asumir quien ocupe el departamento, ya sea propietario o arrendatario.
@@ -55,154 +68,105 @@ value = 20, label="Pie Inicial/Capital Inicial FFMM", format="%g%%")*costo_propi
 
 
 plazo = st.sidebar.slider(min_value=10,max_value= 30, step= 5, value = 20, format="%g años", label="Plazo")
-tasa_interes = st.sidebar.slider(min_value=1.0,max_value= 10.0, step= 0.05,value = 1.5, label="Interés",format="%g%%")/100
+tasa_interes = st.sidebar.slider(min_value=1.0,max_value= 10.0, step= 0.05,value = 1.5, label="Tasa Interés anual",format="%g%%")/100
+plusvalia = st.sidebar.slider(min_value=1.0,max_value= 10.0, step= 0.05,value = 1.5, label="Plusvalía anual",format="%g%%")/100
 
-rentabilidad_ffmm = st.sidebar.slider(min_value=1.0,max_value= 10.0, step= 0.05,value = 1.5,
-label="Rentabilidad FFMM", format="%g%%")/100/12
+
+rentabilidad_ffmm = st.sidebar.slider(min_value=1.0,max_value= 10.0, step= 0.05,value = 1.5,label="Rentabilidad FFMM", format="%g%%")/100
 
 plazo_meses = plazo*12
 
 periodic_tasa_interes = (1+tasa_interes)**(1/12) - 1
-dividendo = -1*np.pmt(periodic_tasa_interes , plazo_meses, costo_propiedad - pie)
+dividendo = -1*npf.pmt(periodic_tasa_interes , plazo_meses, costo_propiedad - pie)
+dividendo =round(1.2*dividendo, 2)
 
-costo_arriendo = st.sidebar.slider(min_value=6,max_value= 50, step =2, value = 8,label="Costo Arriendo", format="%g UF")
+costo_arriendo = st.sidebar.slider(min_value=3.0, max_value= round(1.2*dividendo, 2), step =.5, label="Costo Arriendo", format="%g UF")
 
-if dividendo - costo_arriendo <=0:
-    ahorro_mensual = 0
-else:
-    ahorro_mensual = dividendo - costo_arriendo
+ahorro_mensual = dividendo - costo_arriendo
 
 ahorro_mensual = round(ahorro_mensual, 2)
 
-st.sidebar.write(f'Pie Inicial/Capital Inicial FFMM: {round(pie, 2)} UF')
+
+st.sidebar.write(f'Pie/Capital Inicial FFMM: {int(pie)} UF')
+st.sidebar.write(f'Dividendo: {dividendo} UF')
 st.sidebar.write(f'Ahorro mensual de arriendo: {ahorro_mensual} UF')
 
 
-def gen_data(costo_propiedad, pie, plazo_meses, tasa_interes, rentabilidad_ffmm, costo_arriendo):
-
-    credito_remanente = np.zeros(plazo_meses)
-    interes_cuota_arr = np.zeros(plazo_meses)
-    amortizacion_cuota_arr = np.zeros(plazo_meses)
-    capital_ffmm = np.zeros(plazo_meses)
-    credito_solicitado = costo_propiedad - pie
-    periodic_tasa_interes = (1+tasa_interes)**(1/12) - 1
-    dividendo = -1*np.pmt(periodic_tasa_interes , plazo_meses, credito_solicitado)
-    #costo_total = dividendo * plazo_meses
-    if dividendo - costo_arriendo <=0:
-        ahorro_mensual = 0
-    else:
-        ahorro_mensual = dividendo - costo_arriendo
-
-    for i in range(0, plazo_meses):
-        ## Compra
-        if i == 0:
-            previous_credito_remanente = credito_solicitado
-            previous_capital_ffmm = pie
-        else:
-            previous_credito_remanente = credito_remanente[i-1]
-            previous_capital_ffmm = capital_ffmm[i-1]
-            
-        interes_cuota = round(previous_credito_remanente*periodic_tasa_interes, 2)
-        amortizacion_cuota = round(dividendo - interes_cuota, 2)
-    
-        if previous_credito_remanente - amortizacion_cuota < 0:
-            amortizacion_cuota = previous_credito_remanente
+def gen_data(costo_propiedad, pie, plazo_meses, tasa_interes, rentabilidad_ffmm, costo_arriendo, plusvalia):
         
-        interes_cuota_arr[i] = interes_cuota 
-        amortizacion_cuota_arr[i] = amortizacion_cuota
-        credito_remanente[i] = previous_credito_remanente - amortizacion_cuota
-
-        capital_ffmm[i]= (previous_capital_ffmm+ahorro_mensual)*(1+ rentabilidad_ffmm)
-    
-
     mes_num = np.arange(plazo_meses)
     mes_num = mes_num + 1
 
-    credito_remanente = np.around(credito_remanente, decimals=2)
+    amortizacion_cuota_arr = npf.ppmt(tasa_interes/12, mes_num, plazo_meses, pv = -(costo_propiedad-pie))
+    capital_adeudado = costo_propiedad-pie-np.cumsum(amortizacion_cuota_arr)
 
-    list_valorzcn = [1]
+    interes_cuota_arr = npf.ipmt(tasa_interes/12, mes_num, plazo_meses, pv = -(costo_propiedad-pie))
 
-    for i in range(plazo_meses-1):
-        list_valorzcn.append(list_valorzcn[i]*1 + tasa_interes/12) 
+    dividendos = interes_cuota_arr + amortizacion_cuota_arr
 
-    new_gasto = (costo_propiedad - credito_remanente)
-    new_gasto = new_gasto *list_valorzcn
+    total_pagado_credito = pie + np.cumsum(dividendos)
+
+    ahorro_mensual = dividendos - costo_arriendo
+
+    costo_prepago = capital_adeudado + 1.5*interes_cuota_arr
     
-    pymnts_df = pd.DataFrame({'Mes':mes_num,  'Capital valorizado':new_gasto , 
-    'Gasto total realizado': pie + (dividendo * mes_num), 'Amortización':  amortizacion_cuota_arr, 
-    'Interés($)':interes_cuota_arr})
+    capital_ffmm = npf.fv(rentabilidad_ffmm/12, mes_num, pv = -pie, pmt =-ahorro_mensual)
+    list_valorzcn =npf.fv(plusvalia/12, mes_num, pv = -costo_propiedad, pmt =0)
+
+    rentabilidad_br = (list_valorzcn - costo_prepago)
+    
+    df = pd.DataFrame({'Mes':mes_num,  'Propiedad valorizada':list_valorzcn, 
+    'Gasto crédito acumulado': total_pagado_credito, 'Amortización':  amortizacion_cuota_arr, 
+    'Interés($)':interes_cuota_arr, 'Costo Arriendo':costo_arriendo, 'Capital FFMM': capital_ffmm, 
+    'Rentabilidad': rentabilidad_br, "Capital adeudado": capital_adeudado, 'Costo prepago': costo_prepago})
+
+    return df
+
+df = gen_data(costo_propiedad, pie, plazo_meses, tasa_interes, rentabilidad_ffmm, costo_arriendo, plusvalia)
 
 
-    ffmm_df = pd.DataFrame({'Mes':mes_num,  'Costo Arriendo':costo_arriendo, 'Capital FFMM': capital_ffmm,
-    '0_aux': [0]*plazo_meses})
+def gen_chart(df):
+    range = ['red', 'blue', 'green', 'purple']
+    domain = ['Propiedad valorizada', 'Costo prepago', "Rentabilidad", 'Capital FFMM']
 
-    return pymnts_df, ffmm_df
+    base = alt.Chart(data = df).transform_fold(
+        fold=['Propiedad valorizada', 'Costo prepago', 'Capital FFMM', 'Rentabilidad'],
+        as_=['Tipo', 'UF']
+        ).transform_calculate(
+            name='"Rentabilidad"'  
+        )
 
-pymnts_df, ffmm_df = gen_data(costo_propiedad, pie, plazo_meses, tasa_interes, rentabilidad_ffmm, costo_arriendo)
-
-
-st.table(pymnts_df[:11], )
-
-st.table(ffmm_df[:11], )
-
-
-def gen_compra_chart(pymnts_df):
-    tri_range = ['red', 'blue', 'green']
-    tri_domain = ['Capital valorizado', 'Gasto total realizado', "Rentabilidad"]
-
-    base = alt.Chart(data = pymnts_df)
-    c = base.transform_fold(
-    fold=['Capital valorizado', 'Gasto total realizado'],
-    as_=['Tipo', 'UF']
+    c = base.transform_filter(
+        alt.FieldOneOfPredicate(field='Tipo', oneOf=['Propiedad valorizada', 'Costo prepago', 'Capital FFMM'])
     ).mark_line().encode(
     x = 'Mes:Q',
     y = 'UF:Q',
-    color=alt.Color('Tipo:N', scale=alt.Scale(range=tri_range, 
-    domain=tri_domain), legend=alt.Legend(title=None))
+    color=alt.Color('Tipo:N', scale=alt.Scale(range=range, 
+    domain=domain), legend=alt.Legend(title=None))
     )
 
-    vlines = base.transform_calculate(
-    name='"Rentabilidad"'  
-    ).mark_rule(opacity=0.9).encode(
+    area = base.mark_area(opacity=0.9).encode(
         x='Mes:Q',x2='Mes:Q',
-        y='Capital valorizado:Q',
-        y2='Gasto total realizado:Q',
-    color=alt.Color('name:N', scale=alt.Scale(range=tri_range, 
-        domain=tri_domain), legend=alt.Legend(title=None))
+        y='Propiedad valorizada:Q',
+        y2='Costo prepago:Q',
+    color=alt.Color('name:N', scale=alt.Scale(range=range, 
+        domain=domain), legend=alt.Legend(title=None))
     )
-    c =c + vlines
+    c =c + area
+
     c.layer[0].encoding.y.title = 'UF'
-    return c
 
-def gen_arrdo_chart(ffmm_df):
-    base = alt.Chart(data = ffmm_df)
-    bi_range = ['red',  'green']
-    bi_domain = ['Capital FFMM', "Rentabilidad"]
-
-    c2 = base.transform_fold(
-        fold=['Capital FFMM'],
-        as_=['Tipo', 'UF']
+    res = base.transform_filter(
+        alt.FieldOneOfPredicate(field='Tipo', oneOf=['Capital FFMM', 'Rentabilidad'])
     ).mark_line().encode(
-        x = 'Mes:Q',
-        y = 'UF:Q',
-        color=alt.Color('Tipo:N', scale=alt.Scale(range=bi_range, 
-        domain=bi_domain), legend=alt.Legend(title=None))
+    x = 'Mes:Q',
+    y = 'UF:Q',
+    color=alt.Color('Tipo:N', scale=alt.Scale(range=range, 
+    domain=domain), legend=alt.Legend(title=None))
     )
 
+    return alt.vconcat(c, res)
 
-    vlines2 = base.transform_calculate(
-        name='"Rentabilidad"'  
-    ).mark_rule(opacity=0.9).encode(
-        x='Mes:Q',x2='Mes:Q',
-        y='Capital FFMM:Q',y2='0_aux:Q',
-    color=alt.Color('name:N', scale=alt.Scale(range=bi_range, 
-        domain=bi_domain), legend=alt.Legend(title=None))
-    )
-
-    c2= c2 + vlines2
-    c2.layer[0].encoding.y.title = 'UF'
-
-    return c2
 
 st.write("""## Rentabilidad de comprar: 
 
@@ -215,7 +179,7 @@ Veamoslo de forma gráfica con los parámetros que establecimos.
 
 #st.altair_chart(gen_compra_chart(pymnts_df), use_container_width=True)
 
-cmpd = gen_compra_chart(pymnts_df) |gen_arrdo_chart(ffmm_df)
+cmpd = gen_chart(df)
 st.write("""## Rentabilidad de Arrendar: 
 
 * 
@@ -230,25 +194,20 @@ st.altair_chart(cmpd, use_container_width=True)
 #############################################################################################
 costo_propiedad = 2000
 pie = 400
-# credito_solicitado = 1600
 plazo_meses = 20*12
 tasa_interes = 4 / 100
 periodic_tasa_interes = (1+tasa_interes)**(1/12) - 1
-#dividendo = -1*np.pmt(periodic_tasa_interes , plazo_meses, credito_solicitado)
+plusvalia = 0.05
 
-#costo_total = dividendo * 240
 rentabilidad_ffmm = 0.05/12
 
 
-pymnts_df, ffmm_df = gen_data(costo_propiedad, pie, plazo_meses, tasa_interes, rentabilidad_ffmm, costo_arriendo)
+#df = gen_data(costo_propiedad, pie, plazo_meses, tasa_interes, rentabilidad_ffmm, costo_arriendo, plusvalia)
 
 """La rentabilidad es entonces
 
 """
 
-st.table(pymnts_df[:11], )
-
-st.altair_chart(gen_compra_chart(pymnts_df), use_container_width=True)
-st.altair_chart(gen_arrdo_chart(ffmm_df), use_container_width=True)
+#st.altair_chart(gen_chart(df), use_container_width=True)
 
 

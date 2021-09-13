@@ -6,11 +6,11 @@ import altair as alt
 
 
 
-st.write("""# ¿Cuándo me conviene arrendar vs comprar? Un ejercicio simulado.
+st.write("""# ¿Cuándo conviene arrendar ? Un ejercicio simulado.
 
 ## Introducción
 
-La respuesta es obvia dirán algunos... Si te alcanza para el pie, siempre conviene comprar!!! 
+La respuesta es obvia dirán algunos... Si te alcanza para el pie, nunca conviene arrendar, siempre comprar!!! 
 Pero esto es claramente incorrecto. Debe existir una combinación de precio de venta, arriendo, tasa de interés, etc., 
 por más insólita que parezca, que haga más conveniente el arriendo. Pero cómo encontrar, esa combinación cuando las variables
 son múltiples y con formulas que para mucha gente resulta desconocida o demasiado complicada. 

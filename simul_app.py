@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import numpy_financial as npf
+#import numpy_financial as npf
 import altair as alt
 
 
@@ -47,20 +47,20 @@ st.write("""### Resultado""")
 mes_num = np.arange(plazo_meses)
 mes_num = mes_num + 1
 
-amortizacion_cuota_arr = npf.ppmt(tasa_interes/12, mes_num, plazo_meses, pv = -(precio_propiedad-pie))
+amortizacion_cuota_arr = np.ppmt(tasa_interes/12, mes_num, plazo_meses, pv = -(precio_propiedad-pie))
 capital_adeudado = precio_propiedad-pie-np.cumsum(amortizacion_cuota_arr)
-interes_cuota_arr = npf.ipmt(tasa_interes/12, mes_num, plazo_meses, pv = -(precio_propiedad-pie))
+interes_cuota_arr = np.ipmt(tasa_interes/12, mes_num, plazo_meses, pv = -(precio_propiedad-pie))
 dividendos = interes_cuota_arr + amortizacion_cuota_arr
 dividendo = dividendos[0]
 
 total_pagado_credito = pie + np.cumsum(dividendos)
 costo_prepago = capital_adeudado + 1.5*interes_cuota_arr
 costo_total =  costo_prepago + total_pagado_credito
-list_valorzcn =npf.fv(plusvalia/12, mes_num, pv = -precio_propiedad, pmt =0)
+list_valorzcn =np.fv(plusvalia/12, mes_num, pv = -precio_propiedad, pmt =0)
 rentabilidad_br = (list_valorzcn - costo_total)
 
 ahorro_mensual = dividendo - precio_arriendo
-rentabilidad_ia = npf.fv(rentabilidad_ia_percent/12, mes_num, pv = -pie, pmt =-ahorro_mensual)
+rentabilidad_ia = np.fv(rentabilidad_ia_percent/12, mes_num, pv = -pie, pmt =-ahorro_mensual)
 rentabilidad_arrendar = rentabilidad_ia - pie
 
 ahorro_mensual = round(ahorro_mensual, 2)

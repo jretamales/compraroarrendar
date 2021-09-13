@@ -73,8 +73,6 @@ df = pd.DataFrame({'Año':mes_num/12,  'Propiedad valorizada':list_valorzcn,
 'Comprar': rentabilidad_br, "Capital adeudado": capital_adeudado, 'Costo prepago': costo_prepago,
 'Costo total': costo_total, 'Rentabilidad IA': rentabilidad_ia, 'Inversión inicial IA': pie})
 
-df.to_excel("ca.xlsx")
-
 def gen_chart(df):
 
     base = alt.Chart(data = df).transform_fold(

@@ -94,11 +94,15 @@ def gen_chart(df):
     rtb = base.transform_filter(
         alt.FieldOneOfPredicate(field='Tipo', oneOf=['Comprar', 'Arrendar'])
     ).mark_line().encode(
-    x = alt.X('Año:Q', scale= alt.Scale(domain=[0, x_max], nice=False)),
-    y = alt.Y('UF:Q', scale= alt.Scale(domain=[y_min, y_max], nice=False)),
-    color=alt.Color('Tipo:N', scale=alt.Scale(range=range, 
-    domain=domain), legend=alt.Legend(title=None))
-    ).properties(title = 'Rentabilidad de Compra vs Arriendo')
+    x = alt.X('Año:Q', axis=alt.Axis(title='Año', grid=False), scale= alt.Scale(domain=[0, x_max], nice=False)),
+    y = alt.Y('UF:Q', axis=alt.Axis(title='UF', grid=False), scale= alt.Scale(domain=[y_min, y_max], nice=False)),
+    color=alt.Color('Tipo:N', scale=alt.Scale(range=range, domain=domain), legend=alt.Legend(title=None)),
+    tooltip=alt.Tooltip(domain, format = ".2f")
+    ).properties(title = 'Rentabilidad de comprar vs arriendar').configure_legend(
+  orient='bottom'
+).configure_view(
+    strokeWidth=0
+).interactive()
 
     range = ['#b2e2e2', '#74c476',  '#006d2c']
     domain = ['Propiedad valorizada', 'Costo total', 'Comprar']
@@ -106,11 +110,15 @@ def gen_chart(df):
     rtb_c = base.transform_filter(
         alt.FieldOneOfPredicate(field='Tipo', oneOf=['Propiedad valorizada', 'Costo total', 'Comprar'])
     ).mark_line().encode(
-    x = alt.X('Año:Q'),
-    y = alt.Y('UF:Q'),
-    color=alt.Color('Tipo:N', scale=alt.Scale(range=range, 
-    domain=domain), legend=alt.Legend(title=None))
-    ).properties(title = 'Rentabilidad de Comprar')
+    x = alt.X('Año:Q', axis=alt.Axis(title='Año', grid=False)),
+    y = alt.Y('UF:Q', axis=alt.Axis(title='UF', grid=False)),
+    color=alt.Color('Tipo:N', scale=alt.Scale(range=range,  domain=domain), legend=alt.Legend(title=None)),
+    tooltip=alt.Tooltip(domain, format = ".2f")
+    ).properties(title = 'Rentabilidad de Comprar').configure_legend(
+  orient='bottom'
+).configure_view(
+    strokeWidth=0
+).interactive()
 
     range = ['#dadaeb','#807dba', '#4a1486']
     domain = ['Rentabilidad IA', 'Inversión inicial IA', 'Arrendar']
@@ -118,11 +126,15 @@ def gen_chart(df):
     rtb_a = base.transform_filter(
         alt.FieldOneOfPredicate(field='Tipo', oneOf= ['Rentabilidad IA', 'Inversión inicial IA', 'Arrendar'])
     ).mark_line().encode(
-    x = alt.X('Año:Q'),
-    y = alt.Y('UF:Q'),
-    color=alt.Color('Tipo:N', scale=alt.Scale(range=range, 
-    domain=domain), legend=alt.Legend(title=None))
-    ).properties(title = 'Rentabilidad de Arrendar')
+    x = alt.X('Año:Q', axis=alt.Axis(title='Año', grid=False)),
+    y = alt.Y('UF:Q', axis=alt.Axis(title='UF', grid=False)),
+    color=alt.Color('Tipo:N', scale=alt.Scale(range=range, domain=domain), legend=alt.Legend(title=None)),
+    tooltip=alt.Tooltip(domain, format = ".2f")
+    ).properties(title = 'Rentabilidad de Arrendar').configure_legend(
+  orient='bottom'
+).configure_view(
+    strokeWidth=0
+).interactive()
 
     return rtb, rtb_c, rtb_a
 
@@ -144,9 +156,10 @@ st.write("""La gráfica anterior nos muestra con buena claridad que la alternati
 st.write("### Rentabilidad de comprar")
 st.write("La rentabilidad de comprar una propiedad se generó a partir de la siguiente formula")
 
-st.write(r"""$$RC_t= PP_t - CP_t- TP_t\\
-               RC_t= PP_t - (CP_t + TP_t)\\
-               RC_t= PP_t - CT_t\\
+st.write(r"""$$\footnotesize
+                RC_t= PP_t - CP_t- TP_t\\
+                RC_t= PP_t - (CP_t + TP_t)\\
+                RC_t= PP_t - CT_t\\
                 \text{ }\\
                 RC_t = \text{Rentabilidad de compra en período t}\\
                 PP_t = \text{Precio propiedad al período t}\\
@@ -167,7 +180,8 @@ En este caso la figura es cómo sigue, en vez de utilizar el dinero para pie de 
 alternativo (IA). A su vez, todo ahorro por concepto de pagar un menor precio de arriendo que el dividendo, 
 se depositará en el IA, con la espera que nos genere intereses a medida que pase el tiempo.""")
 
-st.write(r"""$$RA_t= RIA_t - II\\
+st.write(r"""$$\footnotesize
+                RA_t= RIA_t - II\\
                 \text{ }\\
                 RC_t = \text{Rentabilidad acumulada de arrendar en período t}\\
                 RIA_t = \text{Rentabilidad acumulada de instrumento de inversión alternativa al período t}\\

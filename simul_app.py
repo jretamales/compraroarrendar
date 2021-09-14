@@ -119,7 +119,7 @@ def gen_chart(df):
 
     rtb_a = alt.Chart(data =df[df['Tipo'].isin(domain)]).mark_line().encode(
     x = alt.X('Año:Q', axis=alt.Axis(title='Año', grid=False)),
-    y = alt.Y('UF:Q', axis=alt.Axis(title='UF', grid=False)),
+    y = alt.Y('UF:Q', axis=alt.Axis(title='UF', grid=False), scale= alt.Scale(domain=[-(pie+50),y_max], nice=False)),
     color=alt.Color('Tipo:N', scale=alt.Scale(range=range, domain=domain), legend=alt.Legend(title=None)),
     tooltip=['Tipo',alt.Tooltip('UF', format = ".2f"), alt.Tooltip('Año', format = "d")]
     ).properties(title = 'Rentabilidad de Arrendar').configure_title(fontSize=20).configure_legend(

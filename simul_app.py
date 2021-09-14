@@ -4,8 +4,6 @@ import numpy as np
 import numpy_financial as npf
 import altair as alt
 
-
-
 st.write("""# ¿Cuándo conviene arrendar ? Un ejercicio simulado.
 
 ## Introducción
@@ -43,6 +41,9 @@ plazo_meses = plazo*12
 periodic_tasa_interes = (1+tasa_interes)**(1/12) - 1
 
 st.write("""### Resultado""")
+st.write('\n')
+st.write('\n')
+
 
 mes_num = np.arange(plazo_meses)
 mes_num = mes_num + 1
@@ -73,68 +74,59 @@ df = pd.DataFrame({'Año':mes_num/12,  'Propiedad valorizada':list_valorzcn,
 'Comprar': rentabilidad_br, "Capital adeudado": capital_adeudado, 'Costo prepago': costo_prepago,
 'Costo total': costo_total, 'Rentabilidad IA': rentabilidad_ia, 'Inversión inicial IA': pie})
 
+df = pd.melt(df, id_vars="Año", value_vars=['Propiedad valorizada', 'Costo prepago', 'Arrendar', 
+    'Comprar', 'Costo total','Rentabilidad IA', 'Inversión inicial IA'], var_name='Tipo', value_name='UF')
+
+#st.table(df)
 def gen_chart(df):
 
-    base = alt.Chart(data = df).transform_fold(
-        fold=['Propiedad valorizada', 'Costo prepago', 'Arrendar', 'Comprar', 'Costo total',
-        'Rentabilidad IA', 'Inversión inicial IA'],
-        as_=['Tipo', 'UF']
-        ).transform_calculate(
-            name='"Rentabilidad"'  
-        )
-   
     x_max= df['Año'].max()
-    y_min= np.min(df[['Comprar', 'Arrendar']].values)
-    y_max= np.max(df[['Comprar', 'Arrendar']].values)
+    y_min= df[df['Tipo'].isin(['Comprar', 'Arrendar'])]['UF'].min()
+    y_max= df[df['Tipo'].isin(['Comprar', 'Arrendar'])]['UF'].max()
 
 
     range = ['#006d2c', '#4a1486']
     domain = ["Comprar", 'Arrendar']
 
-    rtb = base.transform_filter(
-        alt.FieldOneOfPredicate(field='Tipo', oneOf=['Comprar', 'Arrendar'])
-    ).mark_line().encode(
+    #df
+    rtb = alt.Chart(data =df[df['Tipo'].isin(domain)]).mark_line().encode(
     x = alt.X('Año:Q', axis=alt.Axis(title='Año', grid=False), scale= alt.Scale(domain=[0, x_max], nice=False)),
     y = alt.Y('UF:Q', axis=alt.Axis(title='UF', grid=False), scale= alt.Scale(domain=[y_min, y_max], nice=False)),
-    color=alt.Color('Tipo:N', scale=alt.Scale(range=range, domain=domain), legend=alt.Legend(title=None)),
-    tooltip=alt.Tooltip(domain, format = ".2f")
-    ).properties(title = 'Rentabilidad de comprar vs arriendar').configure_legend(
-  orient='bottom'
-).configure_view(
-    strokeWidth=0
-).interactive()
+    color=alt.Color('Tipo:N', scale=alt.Scale(range=range,  domain=domain), legend=alt.Legend(title=None)),
+    tooltip=['Tipo',alt.Tooltip('UF', format = ".2f"), alt.Tooltip('Año', format = "d")]
+    ).properties(title = 'Rentabilidad de comprar vs arriendar').configure_title(fontSize=20).configure_legend(
+    orient='bottom-right'
+    ).configure_view(
+        strokeWidth=0
+    ).interactive()
 
     range = ['#b2e2e2', '#74c476',  '#006d2c']
     domain = ['Propiedad valorizada', 'Costo total', 'Comprar']
 
-    rtb_c = base.transform_filter(
-        alt.FieldOneOfPredicate(field='Tipo', oneOf=['Propiedad valorizada', 'Costo total', 'Comprar'])
-    ).mark_line().encode(
+    rtb_c = alt.Chart(data =df[df['Tipo'].isin(domain)]).mark_line().encode(
     x = alt.X('Año:Q', axis=alt.Axis(title='Año', grid=False)),
     y = alt.Y('UF:Q', axis=alt.Axis(title='UF', grid=False)),
     color=alt.Color('Tipo:N', scale=alt.Scale(range=range,  domain=domain), legend=alt.Legend(title=None)),
-    tooltip=alt.Tooltip(domain, format = ".2f")
-    ).properties(title = 'Rentabilidad de Comprar').configure_legend(
-  orient='bottom'
-).configure_view(
-    strokeWidth=0
-).interactive()
+    tooltip=['Tipo',alt.Tooltip('UF', format = ".2f"), alt.Tooltip('Año', format = "d")]
+    ).properties(title = 'Rentabilidad de Comprar').configure_title(fontSize=20).configure_legend(
+    orient='bottom-right'
+    ).configure_view(
+        strokeWidth=0
+    ).interactive()
 
     range = ['#dadaeb','#807dba', '#4a1486']
     domain = ['Rentabilidad IA', 'Inversión inicial IA', 'Arrendar']
 
-    rtb_a = base.transform_filter(
-        alt.FieldOneOfPredicate(field='Tipo', oneOf= ['Rentabilidad IA', 'Inversión inicial IA', 'Arrendar'])
-    ).mark_line().encode(
+    rtb_a = alt.Chart(data =df[df['Tipo'].isin(domain)]).mark_line().encode(
     x = alt.X('Año:Q', axis=alt.Axis(title='Año', grid=False)),
     y = alt.Y('UF:Q', axis=alt.Axis(title='UF', grid=False)),
     color=alt.Color('Tipo:N', scale=alt.Scale(range=range, domain=domain), legend=alt.Legend(title=None)),
-    tooltip=alt.Tooltip(domain, format = ".2f")
-    ).properties(title = 'Rentabilidad de Arrendar').configure_legend(
-  orient='bottom'
-).configure_view(
-    strokeWidth=0
-).interactive()
+    tooltip=['Tipo',alt.Tooltip('UF', format = ".2f"), alt.Tooltip('Año', format = "d")]
+    ).properties(title = 'Rentabilidad de Arrendar').configure_title(fontSize=20).configure_legend(
+    orient='bottom-right'
+    ).configure_view(
+        strokeWidth=0
+    ).interactive()
 
     return rtb, rtb_c, rtb_a
 
@@ -160,12 +152,12 @@ st.write(r"""$$\footnotesize
                 RC_t= PP_t - CP_t- TP_t\\
                 RC_t= PP_t - (CP_t + TP_t)\\
                 RC_t= PP_t - CT_t\\
-                \text{ }\\
                 RC_t = \text{Rentabilidad de compra en período t}\\
                 PP_t = \text{Precio propiedad al período t}\\
                 CP_t = \text{Costo Prepago en período t}\\
                 TP_t = \text{Total pagado al período t}\\
-                CT_t = \text{Costo total prepagar en período t}\\$$""")
+                CT_t = \text{Costo total prepagar en período t}\\
+                \text{ }\\$$""")
                 
 st.altair_chart(rtb_c, use_container_width=True)
 
@@ -182,10 +174,10 @@ se depositará en el IA, con la espera que nos genere intereses a medida que pas
 
 st.write(r"""$$\footnotesize
                 RA_t= RIA_t - II\\
-                \text{ }\\
                 RC_t = \text{Rentabilidad acumulada de arrendar en período t}\\
                 RIA_t = \text{Rentabilidad acumulada de instrumento de inversión alternativa al período t}\\
-                II = \text{Inversión inicial en instrumento altenativo}\\$$""")
+                II = \text{Inversión inicial en instrumento altenativo}\\
+                \text{ }\\$$""")
 
 st.altair_chart(rtb_a, use_container_width=True)
 

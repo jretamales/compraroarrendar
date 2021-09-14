@@ -71,8 +71,8 @@ dividendo = round(dividendo, 2)
 df = pd.DataFrame({'Año':mes_num/12,  'Propiedad valorizada':list_valorzcn, 
 'Gasto crédito acumulado': total_pagado_credito, 'Amortización':  amortizacion_cuota_arr, 
 'Interés($)':interes_cuota_arr, 'Costo Arriendo':precio_arriendo, 'Arrendar': rentabilidad_arrendar, 
-'Comprar': rentabilidad_br, "Capital adeudado": capital_adeudado, 'Costo prepago': costo_prepago,
-'Costo total': costo_total, 'Rentabilidad IA': rentabilidad_ia, 'Inversión inicial IA': pie})
+'Comprar': rentabilidad_br, "Capital adeudado": capital_adeudado, 'Costo prepago': -costo_prepago,
+'Costo total': -costo_total, 'Rentabilidad IA': rentabilidad_ia, 'Inversión inicial IA': -pie})
 
 df = pd.melt(df, id_vars="Año", value_vars=['Propiedad valorizada', 'Costo prepago', 'Arrendar', 
     'Comprar', 'Costo total','Rentabilidad IA', 'Inversión inicial IA'], var_name='Tipo', value_name='UF')

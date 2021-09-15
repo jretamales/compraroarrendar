@@ -54,7 +54,9 @@ mes_num = mes_num + 1
 amortizacion_cuota_arr = npf.ppmt(tasa_interes/12, mes_num, plazo_meses, pv = -(precio_propiedad-pie))
 capital_adeudado = precio_propiedad-pie-np.cumsum(amortizacion_cuota_arr)
 interes_cuota_arr = npf.ipmt(tasa_interes/12, mes_num, plazo_meses, pv = -(precio_propiedad-pie))
-dividendos = interes_cuota_arr + amortizacion_cuota_arr
+seg_inc = [precio_propiedad*0.00018]*plazo_meses
+seg_desgrav = capital_adeudado*0.0000852
+dividendos = interes_cuota_arr + amortizacion_cuota_arr+seg_inc+seg_desgrav
 dividendo = dividendos[0]
 
 total_pagado_credito = pie + np.cumsum(dividendos)
@@ -64,8 +66,19 @@ list_valorzcn =npf.fv(plusvalia/12, mes_num, pv = -precio_propiedad, pmt =0)
 rentabilidad_br = (list_valorzcn - costo_total)
 
 ahorro_mensual = dividendo - precio_arriendo
+ahorros_mensuales_aux = [ahorro_mensual]*plazo_meses
+ahorros_mensuales_aux = np.array(ahorros_mensuales_aux)
+ahorros_mensuales_aux_cum = np.cumsum(ahorros_mensuales_aux) +pie 
 rentabilidad_ia = npf.fv(rentabilidad_ia_percent/12, mes_num, pv = -pie, pmt =-ahorro_mensual)
-rentabilidad_arrendar = rentabilidad_ia - pie
+#rentabilidad_ia = np.clip(rentabilidad_ia, a_min=0, a_max=None)
+loc0 = np.where(rentabilidad_ia<=0)[0]
+if loc0.size == 0:
+    rentabilidad_arrendar = rentabilidad_ia - pie
+else:
+    rentabilidad_ia = np.concatenate((rentabilidad_ia[:loc0[0]], ahorros_mensuales_aux_cum[loc0[0]:]), axis=None)
+    rentabilidad_arrendar = rentabilidad_ia - pie
+st.write(loc0)
+
 
 ahorro_mensual = round(ahorro_mensual, 2)
 dividendo = round(dividendo, 2)
@@ -94,7 +107,7 @@ def gen_chart(df):
     #df
     rtb = alt.Chart(data =df[df['Tipo'].isin(domain)]).mark_line().encode(
     x = alt.X('Año:Q', axis=alt.Axis(title='Año', grid=False), scale= alt.Scale(domain=[0, x_max], nice=False)),
-    y = alt.Y('UF:Q', axis=alt.Axis(title='UF', grid=False), scale= alt.Scale(domain=[y_min, y_max], nice=False)),
+    y = alt.Y('UF:Q', axis=alt.Axis(title='UF', grid=False), scale= alt.Scale(domain=[y_min-100,y_max], nice=False)),
     color=alt.Color('Tipo:N', scale=alt.Scale(range=range,  domain=domain), legend=alt.Legend(title=None)),
     tooltip=['Tipo',alt.Tooltip('UF', format = ".2f"), alt.Tooltip('Año', format = "d")]
     ).properties(title = 'Rentabilidad de comprar vs arriendar').configure_title(fontSize=20).configure_legend(
@@ -105,10 +118,14 @@ def gen_chart(df):
 
     range = ['#b2e2e2', '#74c476',  '#006d2c']
     domain = ['Propiedad valorizada', 'Costo total', 'Comprar']
+    
+    y_min = df[df['Tipo'].isin(domain)]['UF'].min()
+    y_max = df[df['Tipo'].isin(domain)]['UF'].max()
+
 
     rtb_c = alt.Chart(data =df[df['Tipo'].isin(domain)]).mark_line().encode(
     x = alt.X('Año:Q', axis=alt.Axis(title='Año', grid=False)),
-    y = alt.Y('UF:Q', axis=alt.Axis(title='UF', grid=False)),
+    y = alt.Y('UF:Q', axis=alt.Axis(title='UF', grid=False), scale= alt.Scale(domain=[y_min-100,y_max], nice=False)),
     color=alt.Color('Tipo:N', scale=alt.Scale(range=range,  domain=domain), legend=alt.Legend(title=None)),
     tooltip=['Tipo',alt.Tooltip('UF', format = ".2f"), alt.Tooltip('Año', format = "d")]
     ).properties(title = 'Rentabilidad de Comprar').configure_title(fontSize=20).configure_legend(
@@ -119,10 +136,12 @@ def gen_chart(df):
 
     range = ['#dadaeb','#807dba', '#4a1486']
     domain = ['Rentabilidad IA', 'Inversión inicial IA', 'Arrendar']
+    y_min = df[df['Tipo'].isin(domain)]['UF'].min()
+    y_max = df[df['Tipo'].isin(domain)]['UF'].max()
 
     rtb_a = alt.Chart(data =df[df['Tipo'].isin(domain)]).mark_line().encode(
     x = alt.X('Año:Q', axis=alt.Axis(title='Año', grid=False)),
-    y = alt.Y('UF:Q', axis=alt.Axis(title='UF', grid=False), scale= alt.Scale(domain=[-(pie+50),y_max], nice=False)),
+    y = alt.Y('UF:Q', axis=alt.Axis(title='UF', grid=False), scale= alt.Scale(domain=[y_min-100,y_max], nice=False)),
     color=alt.Color('Tipo:N', scale=alt.Scale(range=range, domain=domain), legend=alt.Legend(title=None)),
     tooltip=['Tipo',alt.Tooltip('UF', format = ".2f"), alt.Tooltip('Año', format = "d")]
     ).properties(title = 'Rentabilidad de Arrendar').configure_title(fontSize=20).configure_legend(

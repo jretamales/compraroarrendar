@@ -77,7 +77,6 @@ if loc0.size == 0:
 else:
     rentabilidad_ia = np.concatenate((rentabilidad_ia[:loc0[0]], ahorros_mensuales_aux_cum[loc0[0]:]), axis=None)
     rentabilidad_arrendar = rentabilidad_ia - pie
-st.write(loc0)
 
 
 ahorro_mensual = round(ahorro_mensual, 2)

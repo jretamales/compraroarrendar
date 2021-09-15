@@ -32,7 +32,7 @@ value = 20, label="Porcentaje para pie o para inversión inicial para IA", forma
 
 
 plazo = st.sidebar.slider(min_value=10,max_value= 30, step= 5, value = 20, format="%g años", label="Plazo")
-tasa_interes = st.sidebar.slider(min_value=1.0,max_value= 10.0, step= 0.05,value = 2.8, label="CAE crédito hipotecario",format="%g%%")/100
+tasa_interes = st.sidebar.slider(min_value=1.0,max_value= 10.0, step= 0.05,value = 2.8, label="Tasa crédito hipotecario",format="%g%%")/100
 plusvalia = st.sidebar.slider(min_value=1.0,max_value= 10.0, step= 0.05,value = 4., label="Plusvalía anual",format="%g%%")/100
 
 rentabilidad_ia_percent = st.sidebar.slider(min_value=1.0,max_value= 10.0, step= 0.05,value = 4., label="Rentabilidad real esperada de instrumento alternativo (IA)", format="%g%%")/100
@@ -208,7 +208,10 @@ st.markdown("""* Contribuciones
 * Gastos del crédito hipotecario cómo gastos notariales, del conservador, operacionales del banco, etc.
 * Comisión para el corredor, en caso que aplique.
 * Mes de garantía.
-* Seguro de vivienda y desgravamen.""")
+* Variaciones en el valor de los seguros de desgravamen e incendios. Para efectos de esta simulación se consideró que el
+cobro por concepto seguro de incendio correpondía a un 0.018% del precio de la propiedad, mientras que el seguro de 
+desgravamen un 0.0085% del capital adeudado para cada mes. En caso que los valores sean distintos para su caso, lo importante
+es intentar hacer coincidir el dividendo que se muestra en la simulación. Eso es una aporximación suficientemente certera.""")
 
 st.markdown("""Adicionalmente, existen aspectos claves implicitos en los cáculos, que por efectos 
 de alcance, no se detallaron. Para cada uno se incluye un enlace para los que quieran saber más:

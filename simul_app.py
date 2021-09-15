@@ -32,14 +32,17 @@ value = 20, label="Porcentaje para pie o para inversión inicial para IA", forma
 
 
 plazo = st.sidebar.slider(min_value=10,max_value= 30, step= 5, value = 20, format="%g años", label="Plazo")
-tasa_interes = st.sidebar.slider(min_value=1.0,max_value= 10.0, step= 0.05,value = 2.8, label="Tasa Interés anual",format="%g%%")/100
+tasa_interes = st.sidebar.slider(min_value=1.0,max_value= 10.0, step= 0.05,value = 2.8, label="CAE crédito hipotecario",format="%g%%")/100
 plusvalia = st.sidebar.slider(min_value=1.0,max_value= 10.0, step= 0.05,value = 4., label="Plusvalía anual",format="%g%%")/100
 
-rentabilidad_ia_percent = st.sidebar.slider(min_value=1.0,max_value= 10.0, step= 0.05,value = 4., label="Rentabilidad esperada de instrumento alternativo (IA)", format="%g%%")/100
+rentabilidad_ia_percent = st.sidebar.slider(min_value=1.0,max_value= 10.0, step= 0.05,value = 4., label="Rentabilidad real esperada de instrumento alternativo (IA)", format="%g%%")/100
 plazo_meses = plazo*12
 
 periodic_tasa_interes = (1+tasa_interes)**(1/12) - 1
 
+st.sidebar.markdown("### Mini glosario:")
+st.sidebar.caption("**IA**: Instrumento de inversión alternativo. Ejemplos: Depósito a plazo, fondo mutuo, acciones, etc.")
+st.sidebar.caption("**Plusvalía anual**: Incremento de la valorización del bien raíz o la propiedad")
 st.write("""### Resultado""")
 st.write('\n')
 st.write('\n')
@@ -148,7 +151,7 @@ st.write("""La gráfica anterior nos muestra con buena claridad que la alternati
 st.write("### Rentabilidad de comprar")
 st.write("La rentabilidad de comprar una propiedad se generó a partir de la siguiente formula")
 
-st.write(r"""$$\footnotesize
+st.markdown(r"""$$\footnotesize
                 RC_t= PP_t - CP_t- TP_t\\
                 RC_t= PP_t - (CP_t + TP_t)\\
                 RC_t= PP_t - CT_t\\
@@ -156,7 +159,7 @@ st.write(r"""$$\footnotesize
                 PP_t = \text{Precio propiedad al período t}\\
                 CP_t = \text{Costo Prepago en período t}\\
                 TP_t = \text{Total pagado al período t}\\
-                CT_t = \text{Costo total prepagar en período t}\\
+                CT_t = \text{Costo total de prepagar en período t}\\
                 \text{ }\\$$""")
                 
 st.altair_chart(rtb_c, use_container_width=True)
@@ -172,7 +175,7 @@ En este caso la figura es cómo sigue, en vez de utilizar el dinero para pie de 
 alternativo (IA). A su vez, todo ahorro por concepto de pagar un menor precio de arriendo que el dividendo, 
 se depositará en el IA, con la espera que nos genere intereses a medida que pase el tiempo.""")
 
-st.write(r"""$$\footnotesize
+st.markdown(r"""$$\footnotesize
                 RA_t= RIA_t - II\\
                 RC_t = \text{Rentabilidad acumulada de arrendar en período t}\\
                 RIA_t = \text{Rentabilidad acumulada de instrumento de inversión alternativa al período t}\\
@@ -181,3 +184,16 @@ st.write(r"""$$\footnotesize
 
 st.altair_chart(rtb_a, use_container_width=True)
 
+st.markdown("## Notas")
+st.markdown('Esta es una simplificación del problema. Entre los aspectos que también deben ser tomados en cuenta se encuentran')
+st.markdown("""* Contribuciones
+* Gastos del crédito hipotecario cómo gastos notariales, del conservador, operacionales del banco, etc.
+* Comisión para el corredor, en caso que aplique.
+* Mes de garantía.
+* Seguro de vivienda y desgravamen.""")
+
+st.markdown("""Adicionalmente, existen aspectos claves implicitos en los cáculos, que por efectos 
+de alcance, no se detallaron. Para cada uno se incluye un enlace para los que quieran saber más:
+* [Cáclulo valor futuro.](https://es.wikipedia.org/wiki/Valor_tiempo_del_dinero)
+* [Cálculo de dividendos, intereses y amortización.](https://es.wikipedia.org/wiki/Amortizaci%C3%B3n)
+""")

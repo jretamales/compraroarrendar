@@ -9,18 +9,19 @@ st.write("""# ¿Cuándo conviene arrendar ? Un ejercicio simulado.
 ## Introducción
 
 La respuesta es obvia dirán algunos... Si te alcanza para el pie, nunca conviene arrendar, siempre comprar!!! 
-Pero esto es claramente incorrecto. Debe existir una combinación de precio de venta, arriendo, tasa de interés, etc., 
-por más insólita que parezca, que haga más conveniente el arriendo. Pero cómo encontrar, esa combinación cuando las variables
-son múltiples y con formulas que para mucha gente resulta desconocida o demasiado complicada. 
-Para resolver esta dificultad, es que generé esta simulación que permite interactuar con las variables 
-que determinan cada alternativa. Idealmente ingresen los parametros con alguna situación real que les haya tocado. 
-Quién sabe, quizás las condiciones de arriendo que les estaban ofreciendo eran verdaderamente una ganga!
+Pero esto es claramente incorrecto. Debe existir una combinación de precio de venta, arriendo, tasa de interés, 
+etc., que por más insólita que parezca, haga más conveniente el arriendo. Pero: ¿Cómo encontrar, 
+esa combinación cuando las variables son múltiples y con fórmulas que para mucha gente resultan desconocidas 
+o demasiado complicadas?. Para resolver esta dificultad, es que generé esta simulación que permite interactuar 
+con las variables que determinan cada alternativa. Idealmente hay que ingresar los parámetros con alguna situación 
+real que les haya tocado. Quién sabe, quizás las condiciones de arriendo que les estaban ofreciendo eran verdaderamente 
+una ganga!
 
 ## Simulación
 ### Instrucciones generales 
-A la izquierda se encuentran los elementos interactivos para modificar la visualización que muestra cuál es la 
-alternativa más rentable. Luego de la visualización se muestran elementos importantes que son resultado de los parámetros 
-que se seleccionan y servirán para entender cómo se genera la gráfica.
+A la izquierda en la pantalla, se encuentran los elementos interactivos para modificar la visualización que muestra 
+cuál es la alternativa más rentable. Luego de la visualización se muestran elementos importantes que son resultado 
+de los parámetros que se seleccionan y servirán para entender cómo se genera la gráfica.
 """)
 ## STREAMLIT
 
@@ -162,12 +163,13 @@ c2.metric(label = 'Dividendo', value =dividendo)
 c3.metric(label = 'Ahorro mensual de arriendo', value =ahorro_mensual)
 
 st.write("## Justificación")
-st.write("""La gráfica anterior nos muestra con buena claridad que la alternativa más rentable depende de los parámetros 
-        elegidos y el momento que las evaluemos. A partir de esto la pregunta que surge, es ¿Cómo, desde los parametros 
-        que se obtiene ese resultado?. Para ello dividamos el análisis en 2: Rentabilidad de compra y Rentabilidad de arriendo""")
+st.write("""La gráfica anterior nos muestra con buena claridad que la alternativa más rentable 
+depende de los parámetros elegidos y del momento que las evaluemos. A partir de esto, 
+la pregunta que surge es ¿Cómo se obtiene ese resultado desde los parámetros? 
+Para ello es necesario dividir el análisis en dos: Rentabilidad de compra y Rentabilidad de arriendo.""")
 
 st.write("### Rentabilidad de comprar")
-st.write("La rentabilidad de comprar una propiedad se generó a partir de la siguiente formula")
+st.write("La rentabilidad de comprar una propiedad se generó a partir de la siguiente fórmula:")
 
 st.markdown(r"""$$\footnotesize
                 RC_t= PP_t - CP_t- TP_t\\
@@ -184,14 +186,15 @@ st.altair_chart(rtb_c, use_container_width=True)
 
 
 st.write("### Rentabilidad de arrendar")
-st.write("""La rentabilidad por arrendar a simple vista, es un poco más difícil de entender, pero no tanto.
-El punto clave es que el sólo hecho de arrendar no genera rentabilidad. Sólo esta ocurre cuando el precio 
-de arrendar sea menor al dividendo. Idealmente, además qué ese ahorro se destine a algún instrumento de inversión alternativo 
-que nos genere intereses esperados. Cómo por ejemplo un Fondo Mutuo, un depósito a plazo, acciones, bitcoin, etc. 
-
-En este caso la figura es cómo sigue, en vez de utilizar el dinero para pie de la propiedad, se inyecta en este instrumento de inversión
-alternativo (IA). A su vez, todo ahorro por concepto de pagar un menor precio de arriendo que el dividendo, 
-se depositará en el IA, con la espera que nos genere intereses a medida que pase el tiempo.""")
+st.write("""La rentabilidad por arrendar es, a simple vista, un poco más difícil de entender, pero no tanto. 
+El punto clave es que el sólo hecho de arrendar no genera rentabilidad. Esta sólo ocurre cuando el precio de arrendar 
+sea menor al dividendo. Idealmente, sería conveniente además que ese ahorro se destine a algún instrumento 
+de inversión alternativo que nos genere intereses. Cómo por ejemplo un Fondo Mutuo, un depósito a plazo, 
+compra de acciones, bitcoin, etc. En este caso la figura es cómo sigue, en vez de utilizar el dinero 
+para el pie de la propiedad, se inyecta en este instrumento de inversión alternativo (IA). 
+A su vez, todo ahorro por concepto de pagar un menor precio de arriendo que el dividendo, 
+se depositará en el IA, con la esperanza que nos genere intereses a medida que pase el tiempo.
+""")
 
 st.markdown(r"""$$\footnotesize
                 RA_t= RIA_t - II\\
@@ -203,18 +206,19 @@ st.markdown(r"""$$\footnotesize
 st.altair_chart(rtb_a, use_container_width=True)
 
 st.markdown("## Notas")
-st.markdown('Esta es una simplificación del problema. Entre los aspectos que también deben ser tomados en cuenta se encuentran')
-st.markdown("""* Contribuciones
-* Gastos del crédito hipotecario cómo gastos notariales, del conservador, operacionales del banco, etc.
-* Comisión para el corredor, en caso que aplique.
-* Mes de garantía.
-* Variaciones en el valor de los seguros de desgravamen e incendios. Para efectos de esta simulación se consideró que el
-cobro por concepto seguro de incendio correpondía a un 0.018% del precio de la propiedad, mientras que el seguro de 
-desgravamen un 0.0085% del capital adeudado para cada mes. En caso que los valores sean distintos para su caso, lo importante
-es intentar hacer coincidir el dividendo que se muestra en la simulación. Eso es una aporximación suficientemente certera.""")
+st.markdown('Esta es una simplificación del problema. Entre los aspectos que también deben ser tomados en cuenta se encuentran:')
+st.markdown("""* Pago de contribuciones.
+* Gastos del crédito hipotecario, tales como: gastos notariales, del conservador, operacionales del banco, etc.
+* Comisión para el corredor, en caso que ello aplique.
+* Pago de mes de garantía.
+* Variaciones en el valor de los seguros de desgravamen e incendios. Para efectos de esta simulación se consideró 
+que el cobro por concepto seguro de incendio correspondía a un 0,018% del precio de la propiedad, 
+mientras que el seguro de desgravamen representaba un 0,0085% del capital adeudado para cada mes. 
+En caso de que los valores sean distintos para su caso, lo importante es intentar hacer coincidir 
+el dividendo que se muestra en la simulación. Eso es una aproximación suficientemente certera.""")
 
-st.markdown("""Adicionalmente, existen aspectos claves implicitos en los cáculos, que por efectos 
-de alcance, no se detallaron. Para cada uno se incluye un enlace para los que quieran saber más:
-* [Cáclulo valor futuro.](https://es.wikipedia.org/wiki/Valor_tiempo_del_dinero)
+st.markdown("""Adicionalmente, existen aspectos claves implícitos en los cálculos que por efectos de alcance, 
+no se detallaron. Para cada uno se incluye un enlace para los que quieran saber más::
+* [Cálculo valor futuro.](https://es.wikipedia.org/wiki/Valor_tiempo_del_dinero)
 * [Cálculo de dividendos, intereses y amortización.](https://es.wikipedia.org/wiki/Amortizaci%C3%B3n)
 """)

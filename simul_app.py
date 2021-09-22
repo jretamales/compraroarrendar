@@ -34,9 +34,11 @@ value = 20, label="Porcentaje para pie o para inversión inicial para IA", forma
 
 plazo = st.sidebar.slider(min_value=10,max_value= 30, step= 5, value = 20, format="%g años", label="Plazo")
 tasa_interes = st.sidebar.slider(min_value=1.0,max_value= 10.0, step= 0.05,value = 2.8, label="Tasa crédito hipotecario",format="%g%%")/100
-plusvalia = st.sidebar.slider(min_value=1.0,max_value= 10.0, step= 0.05,value = 4., label="Plusvalía anual",format="%g%%")/100
+plusvalia = st.sidebar.slider(min_value=-1.0,max_value= 10.0, step= 0.05,value = 4., label="Plusvalía anual",format="%g%%")/100
 
 rentabilidad_ia_percent = st.sidebar.slider(min_value=1.0,max_value= 10.0, step= 0.05,value = 4., label="Rentabilidad real esperada de instrumento alternativo (IA)", format="%g%%")/100
+correccion_arriendo = st.sidebar.checkbox("¿Corregir precio de arriendo por aumento de plusvalía anual?", value = False)
+
 plazo_meses = plazo*12
 
 periodic_tasa_interes = (1+tasa_interes)**(1/12) - 1
@@ -66,12 +68,18 @@ costo_total =  costo_prepago + total_pagado_credito
 list_valorzcn =npf.fv(plusvalia/12, mes_num, pv = -precio_propiedad, pmt =0)
 rentabilidad_br = (list_valorzcn - costo_total)
 
-ahorro_mensual = dividendo - precio_arriendo
-ahorros_mensuales_aux = [ahorro_mensual]*plazo_meses
-ahorros_mensuales_aux = np.array(ahorros_mensuales_aux)
+if correccion_arriendo:
+    precio_arriendo = npf.fv(plusvalia/12, mes_num, pv = -precio_arriendo, pmt =0)
+    ahorros_mensuales_aux  = dividendo - precio_arriendo
+    ahorro_mensual = np.mean(ahorros_mensuales_aux)
+else:
+    ahorro_mensual = dividendo - precio_arriendo
+    ahorros_mensuales_aux = [ahorro_mensual]*plazo_meses
+    ahorros_mensuales_aux = np.array(ahorros_mensuales_aux)
+
 ahorros_mensuales_aux_cum = np.cumsum(ahorros_mensuales_aux) +pie 
 rentabilidad_ia = npf.fv(rentabilidad_ia_percent/12, mes_num, pv = -pie, pmt =-ahorro_mensual)
-#rentabilidad_ia = np.clip(rentabilidad_ia, a_min=0, a_max=None)
+
 loc0 = np.where(rentabilidad_ia<=0)[0]
 if loc0.size == 0:
     rentabilidad_arrendar = rentabilidad_ia - pie
@@ -160,7 +168,7 @@ c1,c2, c3 = st.columns(3)
 
 c1.metric(label = 'Pie o Inversión inicial en IA', value =int(pie))
 c2.metric(label = 'Dividendo', value =dividendo)
-c3.metric(label = 'Ahorro mensual de arriendo', value =ahorro_mensual)
+c3.metric(label = 'Ahorro mensual de arriendo (promedio)', value =ahorro_mensual)
 
 st.write("## Justificación")
 st.write("""La gráfica anterior nos muestra con buena claridad que la alternativa más rentable 
@@ -168,8 +176,14 @@ depende de los parámetros elegidos y del momento que las evaluemos. A partir de
 la pregunta que surge es ¿Cómo se obtiene ese resultado desde los parámetros? 
 Para ello es necesario dividir el análisis en dos: Rentabilidad de compra y Rentabilidad de arriendo.""")
 
+st.write("""Antes de detallar cómo se generó la rentabilidad de compra y arriendo es importante precisar que nos
+referimos con **rentabilidad**. Para nuestro ejercicio, esto lo entendemos cómo lo queda para nuestro bolsillo 
+al momento $t$ luego de descontar todo lo que incurrimos (gastando o invirtiendo) para obtenerla. 
+Es muy importante tener claridad sobre esta interpretación, porque todo nuestro analisis girará en torno a el.
+Para efectos prácticos entonces, desde ahora en adelante **cuando nos referimos a rentabilidad nos referimos a rentabilidad acumulada.**""")
 st.write("### Rentabilidad de comprar")
-st.write("La rentabilidad de comprar una propiedad se generó a partir de la siguiente fórmula:")
+
+st.write("""La rentabilidad de comprar una propiedad se generó a partir de la siguiente fórmula:""")
 
 st.markdown(r"""$$\footnotesize
                 RC_t= PP_t - CP_t- TP_t\\
@@ -189,8 +203,8 @@ st.write("### Rentabilidad de arrendar")
 st.write("""La rentabilidad por arrendar es, a simple vista, un poco más difícil de entender, pero no tanto. 
 El punto clave es que el sólo hecho de arrendar no genera rentabilidad. Esta sólo ocurre cuando el precio de arrendar 
 sea menor al dividendo. Idealmente, sería conveniente además que ese ahorro se destine a algún instrumento 
-de inversión alternativo que nos genere intereses. Cómo por ejemplo un Fondo Mutuo, un depósito a plazo, 
-compra de acciones, bitcoin, etc. En este caso la figura es cómo sigue, en vez de utilizar el dinero 
+de inversión alternativo que nos genere intereses. Cómo por ejemplo un fondo mutuo, depósito a plazo, 
+compra de acciones, bitcoin, ~~los esquemas primamidales de Rafael Garay o Alberto Chang~~, etc. En este caso la figura es cómo sigue, en vez de utilizar el dinero 
 para el pie de la propiedad, se inyecta en este instrumento de inversión alternativo (IA). 
 A su vez, todo ahorro por concepto de pagar un menor precio de arriendo que el dividendo, 
 se depositará en el IA, con la esperanza que nos genere intereses a medida que pase el tiempo.
@@ -198,16 +212,34 @@ se depositará en el IA, con la esperanza que nos genere intereses a medida que 
 
 st.markdown(r"""$$\footnotesize
                 RA_t= RIA_t - II\\
-                RC_t = \text{Rentabilidad acumulada de arrendar en período t}\\
-                RIA_t = \text{Rentabilidad acumulada de instrumento de inversión alternativa al período t}\\
+                RC_t = \text{Rentabilidad de arrendar en período t}\\
+                RIA_t = \text{Rentabilidad de instrumento de inversión alternativa al período t}\\
                 II = \text{Inversión inicial en instrumento altenativo}\\
                 \text{ }\\$$""")
 
 st.altair_chart(rtb_a, use_container_width=True)
+st.markdown("## Análisis")
+st.markdown("""El escenario de opciones es infinito, por algo es que la decisión en muchos casos es compleja. Pero 
+dentro de los principales puntos a mencionar: 
+* El primer análisis es el más evidentemente pero a la vez más importante. No siempre comprar es lo más conveniente,
+pero en muchas veces lo es. Para ello basta con jugar con los parametros para evidenciarlo.
+* Otro aspecto relevante, es que no cabe duda que la diferencia entre la plusvalía de la propiedad y 
+la rentabilidad esperada del instrumento de inversión alternativo (IA) es un elemento clave para determinar cuál y cuando 
+una opción es más rentable que la otra.
+* A su vez, algo que no muchas veces se considera pero tiene un efecto importante, es cuando se considera 
+que el precio de arriendo no sólo pueda aumentar en virtud de la inflación (UF), también por la plusvalía de la propiedad. 
+Si es así, aún con una buen tasa de retorno o rentabilidad IA, es difícil competir contra la alternativa de comprar. Dado
+que queda poco márgen para ahorrar e invertir en IA, por consiguiente, arrendar se hace menos atractivo.
+*  La simulación inicial por ejemplo (la que se genera al ingresar por primera vez o actualizar la página), 
+muestra una situación dónde hasta el año 16 apróx, es más conveniente arrendar. Y, a partir de ahí mostrar,
+comprar es más rentable. De ahí es que es tan relevante especificar bien la pregunta, más que ¿Que conviene más?, 
+cómo habitualmente se realiza, es ¿Cuándo conviene más?""")
 
-st.markdown("## Notas")
-st.markdown('Esta es una simplificación del problema. Entre los aspectos que también deben ser tomados en cuenta se encuentran:')
-st.markdown("""* Pago de contribuciones.
+
+st.markdown("### Notas")
+st.markdown("""Esta es una simplificación del problema y claramente hay otros aspectos que podrían ser tomados en 
+cuenta:
+* Pago de contribuciones.
 * Gastos del crédito hipotecario, tales como: gastos notariales, del conservador, operacionales del banco, etc.
 * Comisión para el corredor, en caso que ello aplique.
 * Pago de mes de garantía.
@@ -215,7 +247,9 @@ st.markdown("""* Pago de contribuciones.
 que el cobro por concepto seguro de incendio correspondía a un 0,018% del precio de la propiedad, 
 mientras que el seguro de desgravamen representaba un 0,0085% del capital adeudado para cada mes. 
 En caso de que los valores sean distintos para su caso, lo importante es intentar hacer coincidir 
-el dividendo que se muestra en la simulación. Eso es una aproximación suficientemente certera.""")
+el dividendo que se muestra en la simulación. Esa sería una aproximación suficientemente certera.
+
+Aún así, el efecto de estas variables es bastante menor versus los otros elementos considerados.""")
 
 st.markdown("""Adicionalmente, existen aspectos claves implícitos en los cálculos que por efectos de alcance, 
 no se detallaron. Para cada uno se incluye un enlace para los que quieran saber más::

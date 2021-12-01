@@ -246,7 +246,7 @@ no siempre será el precio en que la compro. Dado a que por lo general, las prop
 por lo que se vendería a un precio superior al que le compramos, por ende generando una rentabilidad.</li>
 <li>Sin embargo, vender la propiedad implicaría primero saldar o prepagar la deuda con el banco además de incurrir 
 en los costos adicionales que exigen los bancos, generalmente entre 1.5 y 2 meses de intereses al momento de prepagar. 
-Esto es lo que se representa con la curva <strong><span style="color:#c7c7c7">Costo total de prepago></span></strong>. Pero aparte de eso, esta curva 
+Esto es lo que se representa con la curva <strong><span style="color:#c7c7c7">Costo total de prepago</span></strong>. Pero aparte de eso, esta curva 
 incorpora también todo lo que hemos transferido al banco por concepto de intereses</li>
 </ul style="margin:0;padding:0">
 </div>""", unsafe_allow_html=True)
@@ -276,19 +276,18 @@ st.altair_chart(rtb_a, use_container_width=True)
 st.markdown("## Análisis")
 st.markdown("""El escenario de opciones es infinito, por algo es que la decisión en muchos casos es compleja. Pero 
 dentro de los principales puntos a mencionar: 
-* El primer análisis es el más evidentemente pero a la vez más importante. No siempre comprar es lo más conveniente,
-pero en muchas veces lo es. Para ello basta con jugar con los parametros para evidenciarlo.
-* Otro aspecto relevante, es que no cabe duda que la diferencia entre la plusvalía de la propiedad y 
-la rentabilidad esperada del instrumento de inversión alternativo (IA) es un elemento clave para determinar cuál y cuando 
-una opción es más rentable que la otra.
-* A su vez, algo que no muchas veces se considera pero tiene un efecto importante, es cuando se considera 
-que el precio de arriendo no sólo pueda aumentar en virtud de la inflación (UF), también por la plusvalía de la propiedad. 
-Si es así, aún con una buen tasa de retorno o rentabilidad IA, es difícil competir contra la alternativa de comprar. Dado
-que queda poco márgen para ahorrar e invertir en IA, por consiguiente, arrendar se hace menos atractivo.
-*  La simulación inicial por ejemplo (la que se genera al ingresar por primera vez o actualizar la página), 
-muestra una situación dónde hasta el año 16 apróx, es más conveniente arrendar. Y, a partir de ahí mostrar,
-comprar es más rentable. De ahí es que es tan relevante especificar bien la pregunta, más que ¿Que conviene más?, 
-como habitualmente se realiza, es ¿Cuándo conviene más?""")
+* La primera conclusión es la más obvia, pero a la vez la más importante. Si, aunque no lo crean, no siempre comprar es mejor, 
+pero bajo condiciones razonables de los escenarios propuestos, generalmente lo es.
+* A su vez, no cabe duda que un elemento clave para determinar cual y cuando es la mejor opción, es la diferencia entre la plusvalía de la propiedad y 
+la rentabilidad esperada del instrumento de inversión alternativo (IA). Basicamente, esta diferencia marca cuál es la curva más pronunciada de 
+valorización de cada activo. Mientras más pronunciada sea la curva, más rápidamente se valoriza. 
+* Algo que también tiene un efecto importantes es que el precio de arriendo no sólo pueda aumentar en virtud de la inflación (UF), 
+también por la plusvalía de la propiedad. En este escenario, aún con una buen tasa de retorno o rentabilidad IA, 
+es difícil competir contra la alternativa de comprar. Dado que queda poco márgen para ahorrar e invertir en IA y, por consiguiente, arrendar se hace menos atractivo.
+*  Creo que una situación intersante ocurre en la simulación inicial (la que se genera al ingresar por primera vez o actualizar la página). 
+Aquí se muestra que hasta el año 16 apróx, es más conveniente arrendar y a partir de ahí comprar es más rentable. 
+Me parece intesante este caso porque evidencia un cambio en la forma de enfrentar este decisión. Desde una mirada más absolutista: ¿Que conviene más?, 
+a una más relativa: ¿Cuándo o bajo que condiciones conviene más una por sobre la otra?""")
 
 
 st.markdown("### Notas")

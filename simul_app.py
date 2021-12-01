@@ -229,7 +229,7 @@ st.markdown(r"""$$\footnotesize
                 CT_t = \text{Costo total de prepagar en período t}\\
                 \text{ }\\$$""")
                 
-st.altair_chart(rtb_c, use_container_width=True)
+st.altair_chart(rtb_c, use_container_width=True) 
 
 st.markdown("## Interpretación")
 st.write("""<div>Dado lo complejo del gráfico anterior, merece la pena dedicar un par de minutos a explicarlo:

@@ -4,7 +4,7 @@ import numpy as np
 import numpy_financial as npf
 import altair as alt
 
-st.write("""# ¿Cuándo conviene arrendar ? Un ejercicio simulado.
+st.write("""# ¿Comprar o arrendar? Un ejercicio simulado.
 
 ## Introducción
 

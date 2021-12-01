@@ -296,8 +296,9 @@ st.markdown("""Esta es una simplificación del problema y claramente hay otros a
 cuenta:
 * Pago de contribuciones.
 * Gastos del crédito hipotecario, tales como: gastos notariales, del conservador, operacionales del banco, etc.
-* Comisión para el corredor, en caso que ello aplique.
-* Pago de mes de garantía.
+* Comisión para el corredor, en caso que aplique.
+* Reparaciones o mantenciones a la propiedad.
+* Mes de garantía.
 * Variaciones en el valor de los seguros de desgravamen e incendios. Para efectos de esta simulación se consideró 
 que el cobro por concepto seguro de incendio correspondía a un 0,018% del precio de la propiedad, 
 mientras que el seguro de desgravamen representaba un 0,0085% del capital adeudado para cada mes. 

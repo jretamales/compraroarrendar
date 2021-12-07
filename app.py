@@ -4,14 +4,15 @@ import numpy as np
 import numpy_financial as npf
 import altair as alt
 
-st.write("""# ¿Comprar o arrendar? Un ejercicio simulado.
+st.write("""# ¿Comprar arrendar ? Un ejercicio simulado.
 
 ## Introducción
 
 La respuesta es obvia dirán algunos... Si te alcanza para el pie, nunca conviene arrendar, siempre comprar!!! 
 Pero esto es claramente incorrecto. Debe existir una combinación de precio de venta, arriendo, tasa de interés, 
-etc., que por más insólita que parezca, haga más conveniente el arriendo. Pero: ¿Cómo encontrar, 
-esa combinación cuando las variables son múltiples y con fórmulas que para mucha gente resultan desconocidas 
+etc., por más insólita que parezca, que haga más conveniente el arriendo. 
+
+¿Pero cómo encontrar, esa combinación cuando las variables son múltiples y con fórmulas que para mucha gente resultan desconocidas 
 o demasiado complicadas?. Para resolver esta dificultad, es que generé esta simulación que permite interactuar 
 con las variables que determinan cada alternativa. Idealmente hay que ingresar los parámetros con alguna situación 
 real que les haya tocado. Quién sabe, quizás las condiciones de arriendo que les estaban ofreciendo eran verdaderamente 
@@ -19,9 +20,8 @@ una ganga!
 
 ## Simulación
 ### Instrucciones generales 
-A la izquierda en la pantalla, se encuentran los elementos interactivos para modificar la visualización que muestra 
-cuál es la alternativa más rentable. Luego de la visualización se muestran elementos importantes que son resultado 
-de los parámetros que se seleccionan y servirán para entender el gréfico.
+En la barra lateral se encuentran los elementos interactivos que permientan actualizar los gráficos de este documento. Los cuáles muestran 
+la rentabilidad y comportamiento de cada alternativa.
 """)
 ## STREAMLIT
 
@@ -202,20 +202,20 @@ c1.metric(label = 'Pie o Inversión inicial en IA', value =int(pie))
 c2.metric(label = 'Dividendo', value =dividendo)
 c3.metric(label = 'Ahorro mensual por arriendo', value =ahorro_mensual)
 
-st.write("## Justificación")
-st.write("""La gráfica anterior nos muestra con buena claridad que la alternativa más rentable 
-depende de los parámetros elegidos y del momento que las evaluemos. A partir de esto, 
-la pregunta que surge es ¿Cómo se obtiene ese resultado desde los parámetros? 
-Para ello es necesario dividir el análisis en dos: Rentabilidad de compra y Rentabilidad de arriendo.""")
+st.write("## Interpretación")
+st.write("""El gráfico anterior nos muestra lo que estaban presumiblemente adelantando. Qué la alternativa más rentable 
+depende de los parámetros elegidos y del momento que las evaluemos. Pero entender cómo llegamos a ese resultado no es tan trivial
+y, la mejor forma para lograrlo es analizando cada una separadamente: Rentabilidad de compra y Rentabilidad de arriendo.""")
 
-st.write("""Antes de detallar como se generó la rentabilidad de compra y arriendo es importante precisar que nos
-referimos con **rentabilidad**. Para nuestro ejercicio, esto lo entendemos como lo que queda para nuestro bolsillo 
-al momento $t$ luego de descontar todo lo que incurrimos (gastando o invirtiendo) para obtenerla. 
-Es muy importante tener claridad sobre esta interpretación, porque todo nuestro analisis girará en torno a el.
-Para efectos prácticos entonces, desde ahora en adelante cuando nos referimos a rentabilidad **nos referimos a rentabilidad acumulada.**""")
+st.write("""Sin embargo, antes de entrar en el análisis debemos clarificar a que nos referimos con **rentabilidad**. 
+En palabras sencillas, esto lo definimos como el saldo acumulado al momento $t$ luego de descontar todo lo gastado 
+o invertido hasta ese momento.""")
+
 st.write("### Rentabilidad de comprar")
 
-st.write("""La rentabilidad de comprar una propiedad se generó a partir de la siguiente fórmula:""")
+st.write("""La rentabilidad de comprar una propiedad se generó a partir de la siguiente fórmula. Esta fórmula es
+intimidante en un principio, pero no lo es tanto luego de interactuar con los parámetros y detenerse en la sección 
+de interpretación que sigue:""")
 
 st.markdown(r"""$$\footnotesize
                 RC_t= PP_t + DA_t - CP_t- TP_t\\
@@ -231,37 +231,43 @@ st.markdown(r"""$$\footnotesize
                 
 st.altair_chart(rtb_c, use_container_width=True) 
 
-st.markdown("## Interpretación")
-st.write("""<div>Dado lo complejo del gráfico anterior, merece la pena dedicar un par de minutos a explicarlo:
+st.markdown("#### Interpretación")
+st.write("""<div>
 <ul style="margin:0;padding:0">
-<li>En <strong><span style="color:#2ca02c">verde</span></strong> se muestra la curva resultante de compra. </li>
+<li>En <strong><span style="color:#2ca02c">verde</span></strong> se muestra la rentabilidad de compra. Esta es la resultante luego de combinar
+las variables detalladas a continuación.</li>
 <li>El <strong><span style="color:#bcbd22">dividendo ahorrado</span></strong> tiene una forma extraña, la cuál está dada porque
 esta variable busca representar cuanto del dividendo podemos ahorrar. Naturalmente, que mientras estemos pagando 
-el crédito esto es cero. Sin embargo, una vez que terminamos de pagar, todo el dividendo se ahorra. Cómo suponemos que 
-siempre estamos buscando maximizar rentabilidad, lo ahorrado lo invertimos en un instrumento alternativo, que por simplicidad
-asumiremos que tiene la misma tasa de rentabilidad elegida en los parámetros. Por ello también la leve curva ascendente.</li>
+el crédito esto es 0. Sin embargo, una vez que terminamos de pagar, todo el dividendo se ahorra. Cómo suponemos que 
+siempre estamos buscando maximizar rentabilidad, lo ahorrado igualmente lo invertimos en un instrumento alternativo, que por simplicidad
+asumiremos que tiene la misma tasa de rentabilidad IA elegida en los parámetros. Es por ello, que también toma hacia el final, una leve curva ascendente.</li>
 <li>La curva de <strong><span style="color:#98df8a">propiedad valorizada</span></strong>, es el precio de la propiedad valorizada en el tiempo, calculada mediante valor futuro (ver notas). 
 Aquí el supuesto es que el propietario en cualquier momento podría vender la propiedad. El precio al que vendería la propiedad, claramente 
-no siempre será el precio en que la compro. Dado a que por lo general, las propiedades se valorizan con el tiempo (plusvalía), 
-por lo que se vendería a un precio superior al que le compramos, por ende generando una rentabilidad.</li>
-<li>Sin embargo, vender la propiedad implicaría primero saldar o prepagar la deuda con el banco además de incurrir 
-en los costos adicionales que exigen los bancos, generalmente entre 1.5 y 2 meses de intereses al momento de prepagar. 
-Esto es lo que se representa con la curva <strong><span style="color:#c7c7c7">Costo total de prepago</span></strong>. Pero aparte de eso, esta curva 
-incorpora también todo lo que hemos transferido al banco por concepto de intereses</li>
+no siempre será el precio en que la compró, dado a que las propiedades aumentan o disminuyen su valor en el tiempo. Para efectos de simplicidad, 
+asumimos en esta simulación que solamente hay plusvalía, es decir que se valoriza y se vendería a un precio superior (en UF) al que le compramos.</li>
+<li>Sin embargo, vender la propiedad no es gratis. De partida debemos saldar la deuda para poder venderla y, a su vez,
+considerar todo que debemos pagarle al banco por el hecho de incurrir en el crédito, específicamente lo pagado hasta el momento
+por conceptos de intereses más el costo de prepago. A este concepto le llamamos 
+<u><strong><span style="color:#c7c7c7">Costo total de prepago</span></strong></u>.<p style="line-height:5px;margin:0px;"><br></p>
+Ahora, con respecto a este último, es difícil ser precisos con su cálculo dado que esto depende de lo pactado entre el solicitante 
+y el banco o el que otorga el crédito. Pero para efectos de simmplicar la simulación, sencillamente lo asumimos como 1.5 meses 
+de intereses mensuales calculados al momento que se decida prepagar la totalidad del restante.
 </ul style="margin:0;padding:0">
 </div>""", unsafe_allow_html=True)
 
 
 
 st.write("### Rentabilidad de arrendar")
-st.write("""La rentabilidad por arrendar es, a simple vista, un poco más difícil de entender, pero no tanto. 
-El punto clave es que el sólo hecho de arrendar no genera rentabilidad. Esta sólo ocurre cuando el precio de arrendar 
-sea menor al dividendo. Idealmente, sería conveniente además que ese ahorro se destine a algún instrumento 
-de inversión alternativo que nos genere intereses. Como por ejemplo un fondo mutuo, depósito a plazo, 
-compra de acciones, bitcoin, ~~los esquemas primamidales de Rafael Garay o Alberto Chang~~, etc. En este caso la figura es como sigue, en vez de utilizar el dinero 
-para el pie de la propiedad, se inyecta en este instrumento de inversión alternativo (IA). 
-A su vez, todo ahorro por concepto de pagar un menor precio de arriendo que el dividendo, 
-se depositará en el IA, con la esperanza que nos genere intereses a medida que pase el tiempo.
+st.write("""En comparación con la opción de comprar, la rentabilidad por arrendar a simple vista no es muy evidente. 
+¿Cómo es que voy a generar rentabilidad si arrendar es un gasto? Para responder a esto debemos tomar en cuenta que si
+es posible generar rentabilidad, pero sólo en el caso en que para el arriengdo paguemos que lo que hubiesemos hecho por
+incurrir en el dividendo de la misma propiedad o similar.
+
+Ahora lo lógico sería que ese ahorro no le destinemos al colchón, más bien lo invertimamos en algún
+instrumento de inversión alternativo que nos genere intereses en base a una rentabilidad esperada. 
+Aquí, el abanico de opciones de inversión es múltiple, cómo por ejemplo: fondos mutuos, depósito a plazo, 
+compra de acciones, ETF, bitcoin, ~~los esquemas primamidales de Rafael Garay o Alberto Chang~~, etc. Cualquiera es válido
+cada distintos valores de rentabilidad esperadad y riesgo asociado.
 """)
 
 st.markdown(r"""$$\footnotesize
@@ -274,20 +280,21 @@ st.markdown(r"""$$\footnotesize
 st.altair_chart(rtb_a, use_container_width=True)
 
 st.markdown("## Análisis")
-st.markdown("""El escenario de opciones es infinito, por algo es que la decisión en muchos casos es compleja. Pero 
-dentro de los principales puntos a mencionar: 
-* La primera conclusión es la más obvia, pero a la vez la más importante. Si, aunque no lo crean, no siempre comprar es mejor, 
-pero bajo condiciones razonables de los escenarios propuestos, generalmente lo es.
-* A su vez, no cabe duda que un elemento clave para determinar cual y cuando es la mejor opción, es la diferencia entre la plusvalía de la propiedad y 
-la rentabilidad esperada del instrumento de inversión alternativo (IA). Basicamente, esta diferencia marca cuál es la curva más pronunciada de 
-valorización de cada activo. Mientras más pronunciada sea la curva, más rápidamente se valoriza. 
-* Algo que también tiene un efecto importantes es que el precio de arriendo no sólo pueda aumentar en virtud de la inflación (UF), 
-también por la plusvalía de la propiedad. En este escenario, aún con una buen tasa de retorno o rentabilidad IA, 
-es difícil competir contra la alternativa de comprar. Dado que queda poco márgen para ahorrar e invertir en IA y, por consiguiente, arrendar se hace menos atractivo.
-*  Creo que una situación intersante ocurre en la simulación inicial (la que se genera al ingresar por primera vez o actualizar la página). 
-Aquí se muestra que hasta el año 16 apróx, es más conveniente arrendar y a partir de ahí comprar es más rentable. 
-Me parece intesante este caso porque evidencia un cambio en la forma de enfrentar este decisión. Desde una mirada más absolutista: ¿Que conviene más?, 
-a una más relativa: ¿Cuándo o bajo que condiciones conviene más una por sobre la otra?""")
+st.markdown("""Cómo es evidente, no es un problema sencillo. Hay múltiples variables que se combinan generando un espectro de
+resultados posibles. A pesar de eso, hay varios puntos a sacar en limpio: 
+* La primera conclusión es la más obvia, pero a la vez la más importante. No siempre es mejor comprar, pero casi siempre lo es. 
+(dado los valores posibles aquí propuestos) 
+* Un aspecto clave es la diferencia entre la plusvalía de la propiedad y 
+la rentabilidad esperada del instrumento de inversión alternativo (IA). Basicamente, esta diferencia marca cuál es la curva
+más pronunciada de valorización de cada activo. Mientras más pronunciada sea la curva, más rápidamente se valoriza. 
+* El precio de arriendo no sólo pueda aumentar en virtud de la inflación (UF), 
+también lo hace por la plusvalía de la propiedad. En este escenario, aún con una buen tasa de retorno o rentabilidad IA, 
+es difícil competir contra la alternativa de comprar. Dado que queda poco márgen para ahorrar e invertir en IA haciendo menos 
+atractiva la alternativa de arrinedo.
+* Una situación intersante ocurre en la simulación inicial (la que se genera al ingresar por primera vez o actualizar la página). 
+Aquí se muestra que hasta el año 16 apróx, es más conveniente arrendar y a partir de ahí, comprar.
+Este escenario evidencia un cambio en la forma de enfrentar esta decisión. A partir de una mirada más absolutista: 
+¿Que conviene más?, a una más relativa: ¿Cuándo o bajo que condiciones conviene más una por sobre la otra?""")
 
 
 st.markdown("### Notas")
@@ -302,9 +309,10 @@ cuenta:
 que el cobro por concepto seguro de incendio correspondía a un 0,018% del precio de la propiedad, 
 mientras que el seguro de desgravamen representaba un 0,0085% del capital adeudado para cada mes. 
 En caso de que los valores sean distintos para su caso, lo importante es intentar hacer coincidir 
-el dividendo que se muestra en la simulación. Esa sería una aproximación suficientemente certera.
+el dividendo que se muestra en la simulación, generando aproximadamente el mismo resultado. 
 
-Aún así, el efecto de estas variables es bastante menor versus los otros elementos considerados.""")
+Aún así, nuestro supuesto es que el efecto de estas variables es bastante menor versus los otros elementos considerados, 
+por ello es que no se condideraron.""")
 
 st.markdown("""Adicionalmente, existen aspectos claves implícitos en los cálculos que por efectos de alcance, 
 no se detallaron. Para cada uno se incluye un enlace para los que quieran saber más::

@@ -39,7 +39,7 @@ plusvalia = st.sidebar.slider(min_value=-1.0,max_value= 10.0, step= 0.05,value =
 rentabilidad_ia_percent = st.sidebar.slider(min_value=1.0,max_value= 10.0, step= 0.05,value = 4., label="Rentabilidad real esperada de instrumento alternativo (IA)", format="%g%%")/100
 mes_extra = st.sidebar.slider(min_value=plazo, max_value= 60, step= 5, value = plazo+5, format="%g años", label="Horizonte de evaluación")
 mes_extra = (mes_extra- plazo)*12
-correccion_arriendo = st.sidebar.checkbox("¿Corregir precio de arriendo por aumento de plusvalía anual?", value = False)
+#correccion_arriendo = st.sidebar.checkbox("¿Corregir precio de arriendo por aumento de plusvalía anual?", value = False)
 
 plazo_meses = plazo*12
 
@@ -87,14 +87,14 @@ dividendos_br2 = np.concatenate((np.repeat(0, plazo_meses), np.repeat(dividendo,
 rentabilidad_br2 = npf.fv(rentabilidad_ia_percent/12, mes_num_eval, pv = -dividendos_br2, pmt =0)
 rentabilidad_br2 = np.cumsum(rentabilidad_br2)
 
-if correccion_arriendo:
-    precio_arriendo = npf.fv(plusvalia/12, mes_num_eval, pv = -precio_arriendo, pmt =0)
-    ahorros_mensuales_aux  = dividendo - precio_arriendo
-    ahorro_mensual = np.mean(ahorros_mensuales_aux)
-else:
-    ahorro_mensual = dividendo - precio_arriendo
-    ahorros_mensuales_aux = [ahorro_mensual]*(plazo_meses+mes_extra)
-    ahorros_mensuales_aux = np.array(ahorros_mensuales_aux)
+# if correccion_arriendo:
+#     precio_arriendo = npf.fv(plusvalia/12, mes_num_eval, pv = -precio_arriendo, pmt =0)
+#     ahorros_mensuales_aux  = dividendo - precio_arriendo
+#     ahorro_mensual = np.mean(ahorros_mensuales_aux)
+# else:
+ahorro_mensual = dividendo - precio_arriendo
+ahorros_mensuales_aux = [ahorro_mensual]*(plazo_meses+mes_extra)
+ahorros_mensuales_aux = np.array(ahorros_mensuales_aux)
 
 ahorros_mensuales_aux_cum = np.cumsum(ahorros_mensuales_aux) +pie 
 rentabilidad_ia = npf.fv(rentabilidad_ia_percent/12, mes_num_eval, pv = -pie, pmt =-ahorro_mensual)
